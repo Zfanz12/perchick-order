@@ -54,7 +54,7 @@ export interface MapPinLocation {
 export interface CustomerDetails {
   fullName: string;
   whatsapp: string;
-  fulfillmentMethod: FulfillmentMethod;
+  fulfillmentMethod: FulfillmentMethod | null;
   mapPin?: MapPinLocation | null;
   address?: string;
   notes?: string;
@@ -118,7 +118,7 @@ export interface DirectOrderStoreState {
   _hasHydrated: boolean;
   setHasHydrated: (state: boolean) => void;
   orderItems: OrderItem[];
-  deliveryScheduleId: DeliveryScheduleId;
+  deliveryScheduleId: DeliveryScheduleId | null;
   customer: CustomerDetails;
   paymentProof: PaymentProof | null;
   lastSubmittedOrder: SubmittedOrder | null;
@@ -134,7 +134,7 @@ export interface DirectOrderStoreState {
   removeOrderItem: (itemId: string) => void;
   clearOrderItems: () => void;
 
-  setDeliveryScheduleId: (scheduleId: DeliveryScheduleId) => void;
+  setDeliveryScheduleId: (scheduleId: DeliveryScheduleId | null) => void;
   updateCustomer: (patch: Partial<CustomerDetails>) => void;
   setPaymentProof: (proof: PaymentProof | null) => void;
   completeOrderSubmission: (submittedOrder: SubmittedOrder) => void;

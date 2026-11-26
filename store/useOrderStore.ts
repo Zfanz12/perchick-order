@@ -18,7 +18,7 @@ import type {
 const INITIAL_CUSTOMER: CustomerDetails = {
   fullName: '',
   whatsapp: '',
-  fulfillmentMethod: 'DELIVERY',
+  fulfillmentMethod: null,
   mapPin: null,
   address: '',
   notes: '',
@@ -31,7 +31,7 @@ export const useOrderStore = create<DirectOrderStoreState>()(
       setHasHydrated: (state: boolean) => set({ _hasHydrated: state }),
 
       orderItems: [],
-      deliveryScheduleId: 'MINGGU_29_NOV',
+      deliveryScheduleId: null,
       customer: INITIAL_CUSTOMER,
       paymentProof: null,
       lastSubmittedOrder: null,
@@ -103,7 +103,7 @@ export const useOrderStore = create<DirectOrderStoreState>()(
 
       clearOrderItems: () => set({ orderItems: [] }),
 
-      setDeliveryScheduleId: (deliveryScheduleId: DeliveryScheduleId) =>
+      setDeliveryScheduleId: (deliveryScheduleId: DeliveryScheduleId | null) =>
         set({ deliveryScheduleId }),
 
       updateCustomer: (patch: Partial<CustomerDetails>) =>
@@ -124,6 +124,8 @@ export const useOrderStore = create<DirectOrderStoreState>()(
       startNewOrder: () =>
         set({
           orderItems: [],
+          deliveryScheduleId: null,
+          customer: INITIAL_CUSTOMER,
           paymentProof: null,
           lastSubmittedOrder: null,
         }),

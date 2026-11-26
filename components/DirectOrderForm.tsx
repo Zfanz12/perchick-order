@@ -125,6 +125,8 @@ async function compressProofImage(file: File): Promise<PaymentProof> {
 interface FieldErrors {
   fullName?: string;
   whatsapp?: string;
+  deliverySchedule?: string;
+  fulfillmentMethod?: string;
   mapPin?: string;
   address?: string;
   paymentProof?: string;
@@ -172,14 +174,17 @@ export function DirectOrderForm() {
   const selectedPackage = draftPackageId ? getPackageById(draftPackageId) : null;
   const isTriple = draftPackageId === 'TRIPLE';
   const draftUnitPrice = selectedPackage
-      ? selectedPackage.basePrice +
-      (draftSauce ? getSauceExtraPrice(draftSauce) : 0) +
-      (draftMushroom ? MUSHROOM_ADDON_PRICE : 0)
-      : 0;
+    ? selectedPackage.basePrice +
+    (draftSauce ? getSauceExtraPrice(draftSauce) : 0) +
+    (draftMushroom ? MUSHROOM_ADDON_PRICE : 0)
+    : 0;
 
   const pricing = calculateItemsPricing(orderItems);
-  const selectedSchedule = getScheduleById(deliveryScheduleId);
+  const selectedSchedule = deliveryScheduleId
+    ? getScheduleById(deliveryScheduleId)
+    : null;
   const isDelivery = customer.fulfillmentMethod === 'DELIVERY';
+  const isPickup = customer.fulfillmentMethod === 'PICKUP';
 
   const handleAddOrderItem = () => {
     setDraftError(null);
@@ -212,7 +217,7 @@ export function DirectOrderForm() {
     const sauceText = getSauceById(draftSauce).name;
     const mushroomText = draftMushroom ? ' + Mushroom' : '';
     setAddedFeedback(
-        `${draftQty}× ${selectedPackage.name} (${sidesText} • ${sauceText}${mushroomText}) ditambahkan`
+      `${draftQty}× ${selectedPackage.name} (${sidesText} • ${sauceText}${mushroomText}) ditambahkan`
     );
 
     // Reset all draft selections back to empty/unselected
@@ -280,6 +285,13 @@ export function DirectOrderForm() {
       nextErrors.whatsapp =
         'Masukkan nomor WhatsApp Indonesia yang valid (contoh: 081234567890).';
     }
+    if (!deliveryScheduleId) {
+      nextErrors.deliverySchedule = 'Pilih jadwal terlebih dahulu.';
+    }
+    if (!customer.fulfillmentMethod) {
+      nextErrors.fulfillmentMethod =
+        'Pilih metode pengambilan (Pickup atau Delivery).';
+    }
     if (isDelivery && !customer.mapPin) {
       nextErrors.mapPin = 'Tap di peta untuk menentukan titik lokasi pengantaran.';
     }
@@ -298,7 +310,7 @@ export function DirectOrderForm() {
       return;
     }
 
-    if (!paymentProof) return;
+    if (!paymentProof || !deliveryScheduleId) return;
 
     setIsSubmitting(true);
     try {
@@ -464,6 +476,11 @@ export function DirectOrderForm() {
                   );
                 })}
               </div>
+              {fieldErrors.deliverySchedule && (
+                <p className="mt-1 font-sans text-xs font-semibold text-[#D91E18]">
+                  {fieldErrors.deliverySchedule}
+                </p>
+              )}
             </div>
 
             {/* Saus: Cheese / Garlic only (no price text, no description) */}
@@ -510,15 +527,15 @@ export function DirectOrderForm() {
                   setDraftError(null);
                 }}
                 className={`flex min-h-[42px] w-full cursor-pointer items-center justify-between gap-3 rounded-xl border-2 px-3 py-2 text-left transition ${draftSauce === 'Mix'
-                    ? 'border-[#D91E18] bg-[#FFFBEB] ring-2 ring-[#FFC72C]/50'
-                    : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
+                  ? 'border-[#D91E18] bg-[#FFFBEB] ring-2 ring-[#FFC72C]/50'
+                  : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
                   }`}
               >
                 <span className="flex items-center gap-2.5">
                   <span
                     className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 ${draftSauce === 'Mix'
-                        ? 'border-[#D91E18] bg-[#D91E18] text-white'
-                        : 'border-[#1C1917]/35 bg-white'
+                      ? 'border-[#D91E18] bg-[#D91E18] text-white'
+                      : 'border-[#1C1917]/35 bg-white'
                       }`}
                   >
                     {draftSauce === 'Mix' && (
@@ -714,7 +731,15 @@ export function DirectOrderForm() {
                     <button
                       key={schedule.id}
                       type="button"
-                      onClick={() => setDeliveryScheduleId(schedule.id)}
+                      onClick={() => {
+                        setDeliveryScheduleId(schedule.id);
+                        if (fieldErrors.deliverySchedule) {
+                          setFieldErrors((prev) => ({
+                            ...prev,
+                            deliverySchedule: undefined,
+                          }));
+                        }
+                      }}
                       className={`flex min-h-[52px] cursor-pointer items-center justify-between gap-2 rounded-2xl border-2 px-4 py-3 text-left transition ${active
                         ? 'border-[#D91E18] bg-[#FFFBEB] ring-4 ring-[#FFC72C]/40'
                         : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
@@ -732,6 +757,11 @@ export function DirectOrderForm() {
                   );
                 })}
               </div>
+              {fieldErrors.deliverySchedule && (
+                <p className="mt-1 font-sans text-xs font-semibold text-[#D91E18]">
+                  {fieldErrors.deliverySchedule}
+                </p>
+              )}
             </div>
 
             {/* Fulfillment Method: Pickup vs Delivery */}
@@ -746,6 +776,7 @@ export function DirectOrderForm() {
                     updateCustomer({ fulfillmentMethod: 'PICKUP' });
                     setFieldErrors((prev) => ({
                       ...prev,
+                      fulfillmentMethod: undefined,
                       mapPin: undefined,
                       address: undefined,
                     }));
@@ -768,7 +799,15 @@ export function DirectOrderForm() {
 
                 <button
                   type="button"
-                  onClick={() => updateCustomer({ fulfillmentMethod: 'DELIVERY' })}
+                  onClick={() => {
+                    updateCustomer({ fulfillmentMethod: 'DELIVERY' });
+                    if (fieldErrors.fulfillmentMethod) {
+                      setFieldErrors((prev) => ({
+                        ...prev,
+                        fulfillmentMethod: undefined,
+                      }));
+                    }
+                  }}
                   className={`flex min-h-[52px] cursor-pointer items-center gap-2.5 rounded-2xl border-2 px-4 py-3 text-left transition ${customer.fulfillmentMethod === 'DELIVERY'
                     ? 'border-[#D91E18] bg-[#FFFBEB] ring-4 ring-[#FFC72C]/40'
                     : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
@@ -785,10 +824,15 @@ export function DirectOrderForm() {
                   </span>
                 </button>
               </div>
+              {fieldErrors.fulfillmentMethod && (
+                <p className="mt-1 font-sans text-xs font-semibold text-[#D91E18]">
+                  {fieldErrors.fulfillmentMethod}
+                </p>
+              )}
             </div>
 
-            {/* Conditional Delivery Dropdown + Address OR Pickup Info */}
-            {isDelivery ? (
+            {/* Conditional Delivery Map + Address OR Pickup Info */}
+            {isDelivery && (
               <div className="space-y-4 rounded-2xl border-2 border-[#1C1917]/10 bg-[#FFFBEB]/60 p-4">
                 <div>
                   <label className="mb-1.5 flex items-center gap-1.5 font-sans text-sm font-bold text-[#1C1917]">
@@ -836,8 +880,8 @@ export function DirectOrderForm() {
                     }}
                     placeholder="Tulis alamat lengkap, nama kos/rumah, dan patokan"
                     className={`w-full rounded-2xl border-2 bg-white px-4 py-3 font-sans text-sm text-[#1C1917] outline-none transition placeholder:text-[#78716C]/70 ${fieldErrors.address
-                        ? 'border-[#D91E18] focus:ring-4 focus:ring-[#D91E18]/15'
-                        : 'border-[#1C1917]/20 focus:border-[#D91E18] focus:ring-4 focus:ring-[#FFC72C]/35'
+                      ? 'border-[#D91E18] focus:ring-4 focus:ring-[#D91E18]/15'
+                      : 'border-[#1C1917]/20 focus:border-[#D91E18] focus:ring-4 focus:ring-[#FFC72C]/35'
                       }`}
                   />
                   {fieldErrors.address && (
@@ -847,9 +891,11 @@ export function DirectOrderForm() {
                   )}
                 </div>
               </div>
-            ) : (
+            )}
+
+            {isPickup && (
               <div className="rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4 text-xs leading-relaxed text-emerald-950">
-                <strong>Info Pickup:</strong> Titik pengambilan akan diinfokan Admin Perchick via WhatsApp pada jadwal yang dipilih ({selectedSchedule.dayLabel}).
+                <strong>Info Pickup:</strong> Titik pengambilan akan diinfokan Admin Perchick via WhatsApp{selectedSchedule ? ` pada jadwal yang dipilih (${selectedSchedule.dayLabel})` : ''}.
               </div>
             )}
 
@@ -982,11 +1028,12 @@ export function DirectOrderForm() {
 
               <div className="space-y-1 rounded-xl bg-[#FFFBEB] px-3 py-2 text-xs text-[#57534E]">
                 <p>
-                  <strong>Jadwal:</strong> {selectedSchedule.dayLabel}
+                  <strong>Jadwal:</strong>{' '}
+                  {selectedSchedule ? selectedSchedule.dayLabel : 'Belum dipilih'}
                 </p>
                 <p>
                   <strong>Metode:</strong>{' '}
-                  {isDelivery ? 'Delivery' : 'Pickup'}
+                  {isDelivery ? 'Delivery' : isPickup ? 'Pickup' : 'Belum dipilih'}
                 </p>
               </div>
 
