@@ -26,6 +26,7 @@ import {
   BRAND_INFO,
   DELIVERY_SCHEDULES,
   MENU_PACKAGES,
+  MIX_SAUCE_ADDON_PRICE,
   MUSHROOM_ADDON_PRICE,
   SAUCE_OPTIONS,
   SIDE_OPTIONS,
@@ -33,6 +34,8 @@ import {
   formatRupiah,
   formatSidesLabel,
   getPackageById,
+  getSauceById,
+  getSauceExtraPrice,
   getScheduleById,
 } from '@/constants/menu';
 import { DeliveryMapPicker } from '@/components/DeliveryMapPicker';
@@ -169,7 +172,9 @@ export function DirectOrderForm() {
   const selectedPackage = draftPackageId ? getPackageById(draftPackageId) : null;
   const isTriple = draftPackageId === 'TRIPLE';
   const draftUnitPrice = selectedPackage
-    ? selectedPackage.basePrice + (draftMushroom ? MUSHROOM_ADDON_PRICE : 0)
+    ? selectedPackage.basePrice +
+      (draftSauce ? getSauceExtraPrice(draftSauce) : 0) +
+      (draftMushroom ? MUSHROOM_ADDON_PRICE : 0)
     : 0;
 
   const pricing = calculateItemsPricing(orderItems);
@@ -204,9 +209,10 @@ export function DirectOrderForm() {
     );
 
     const sidesText = formatSidesLabel(resolvedSides);
+    const sauceText = getSauceById(draftSauce).name;
     const mushroomText = draftMushroom ? ' + Mushroom' : '';
     setAddedFeedback(
-      `${draftQty}× ${selectedPackage.name} (${sidesText} • ${draftSauce}${mushroomText}) ditambahkan`
+      `${draftQty}× ${selectedPackage.name} (${sidesText} • ${sauceText}${mushroomText}) ditambahkan`
     );
 
     // Reset all draft selections back to empty/unselected
@@ -468,7 +474,8 @@ export function DirectOrderForm() {
 
                   <div className="grid grid-cols-2 gap-2.5">
                     {SAUCE_OPTIONS.map((sauce) => {
-                      const active = draftSauce === sauce.id;
+                      const active =
+                        draftSauce === 'Mix' || draftSauce === sauce.id;
                       return (
                         <button
                           key={sauce.id}
@@ -494,6 +501,41 @@ export function DirectOrderForm() {
                       );
                     })}
                   </div>
+
+                  {/* Mix Sauce Checkbox (+Rp3.000) */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDraftSauce((prev) => (prev === 'Mix' ? null : 'Mix'));
+                      setDraftError(null);
+                    }}
+                    className={`flex min-h-[42px] w-full cursor-pointer items-center justify-between gap-3 rounded-xl border-2 px-3 py-2 text-left transition ${
+                      draftSauce === 'Mix'
+                        ? 'border-[#D91E18] bg-[#FFFBEB] ring-2 ring-[#FFC72C]/50'
+                        : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 ${
+                          draftSauce === 'Mix'
+                            ? 'border-[#D91E18] bg-[#D91E18] text-white'
+                            : 'border-[#1C1917]/35 bg-white'
+                        }`}
+                      >
+                        {draftSauce === 'Mix' && (
+                          <Check className="h-3 w-3 stroke-[3]" />
+                        )}
+                      </span>
+                      <span className="font-display text-sm sm:text-base font-bold text-[#1C1917]">
+                        Mix Saus (Cheese + Garlic)
+                      </span>
+                    </span>
+
+                    <span className="font-sans text-xs sm:text-sm font-bold text-[#1C1917] shrink-0">
+                      +{formatRupiah(MIX_SAUCE_ADDON_PRICE)}
+                    </span>
+                  </button>
                 </div>
 
                 {/* Add-on: + Mushroom with plain black price text (no pill, no description) */}
@@ -855,8 +897,10 @@ export function DirectOrderForm() {
                         {orderItems.map((item) => {
                           const pkg = getPackageById(item.packageId);
                           const sidesText = formatSidesLabel(item.sides);
+                          const sauceLabel = getSauceById(item.sauceId).name;
                           const lineTotal =
                             (pkg.basePrice +
+                              getSauceExtraPrice(item.sauceId) +
                               (item.addMushroom ? MUSHROOM_ADDON_PRICE : 0)) *
                             item.quantity;
 
@@ -870,7 +914,7 @@ export function DirectOrderForm() {
                                   {item.quantity}× {pkg.name}
                                 </p>
                                 <p className="text-xs text-[#57534E]">
-                                  {sidesText} • {item.sauceId}
+                                  {sidesText} • {sauceLabel}
                                   {item.addMushroom ? ' + Mushroom' : ''}
                                 </p>
 
@@ -923,6 +967,13 @@ export function DirectOrderForm() {
                           );
                         })}
                       </ul>
+                    )}
+
+                    {pricing.totalMixSauce > 0 && (
+                      <div className="flex items-center justify-between text-xs font-semibold text-[#1C1917]">
+                        <span>Mix Saus (Cheese + Garlic)</span>
+                        <span>+{formatRupiah(pricing.totalMixSauce)}</span>
+                      </div>
                     )}
 
                     {pricing.totalMushroom > 0 && (

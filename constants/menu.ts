@@ -27,6 +27,7 @@ export const BRAND_INFO = {
 } as const;
 
 export const MUSHROOM_ADDON_PRICE = 5000;
+export const MIX_SAUCE_ADDON_PRICE = 3000;
 
 export const MENU_PACKAGES: MenuPackage[] = [
   {
@@ -103,11 +104,18 @@ export function getPackageById(id: PackageId): MenuPackage {
 }
 
 export function getSauceById(id: SauceId): SauceOption {
+  if (id === 'Mix') {
+    return { id: 'Mix', name: 'Mix (Cheese + Garlic)' };
+  }
   const found = SAUCE_OPTIONS.find((sauce) => sauce.id === id);
   if (!found) {
     throw new Error(`Unknown sauce id: ${id}`);
   }
   return found;
+}
+
+export function getSauceExtraPrice(id: SauceId): number {
+  return id === 'Mix' ? MIX_SAUCE_ADDON_PRICE : 0;
 }
 
 export function getScheduleById(id: DeliveryScheduleId): DeliveryScheduleOption {
@@ -141,17 +149,21 @@ export function calculateItemsPricing(items: OrderItem[]): PriceBreakdown {
     (acc, item) => {
       const pkg = getPackageById(item.packageId);
       const qty = Math.max(1, Math.floor(item.quantity));
+      const mixSauceCost = getSauceExtraPrice(item.sauceId);
       const mushroomCost = item.addMushroom ? MUSHROOM_ADDON_PRICE : 0;
 
       acc.totalItems += qty;
       acc.subtotalPackages += pkg.basePrice * qty;
+      acc.totalMixSauce += mixSauceCost * qty;
       acc.totalMushroom += mushroomCost * qty;
-      acc.grandTotal = acc.subtotalPackages + acc.totalMushroom;
+      acc.grandTotal =
+        acc.subtotalPackages + acc.totalMixSauce + acc.totalMushroom;
       return acc;
     },
     {
       totalItems: 0,
       subtotalPackages: 0,
+      totalMixSauce: 0,
       totalMushroom: 0,
       grandTotal: 0,
     }

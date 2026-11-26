@@ -2,7 +2,7 @@ export type PackageId = 'SINGLE' | 'DOUBLE' | 'TRIPLE';
 
 export type SideOptionId = 'MACARONI' | 'FRIES';
 
-export type SauceId = 'Cheese' | 'Garlic';
+export type SauceId = 'Cheese' | 'Garlic' | 'Mix';
 
 export type DeliveryScheduleId = 'MINGGU_29_NOV' | 'SENIN_30_NOV';
 
@@ -71,6 +71,7 @@ export interface PaymentProof {
 export interface PriceBreakdown {
   totalItems: number;
   subtotalPackages: number;
+  totalMixSauce: number;
   totalMushroom: number;
   grandTotal: number;
 }
