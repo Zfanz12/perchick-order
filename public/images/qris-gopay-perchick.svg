@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 440" width="360" height="440" role="img" aria-label="QRIS GoPay Merchant PERCHICK - Perfectly Chicken">
+  <defs>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#D91E18" />
+      <stop offset="100%" stop-color="#EA580C" />
+    </linearGradient>
+  </defs>
+
+  <!-- Card frame -->
+  <rect x="4" y="4" width="352" height="432" rx="22" fill="#FFFFFF" stroke="#1C1917" stroke-width="3" />
+  <rect x="4" y="4" width="352" height="62" rx="20" fill="url(#headerGrad)" />
+  <rect x="4" y="44" width="352" height="22" fill="url(#headerGrad)" />
+
+  <!-- QRIS & GoPay Header -->
+  <rect x="20" y="18" width="76" height="32" rx="8" fill="#FFFFFF" />
+  <text x="58" y="40" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="18" fill="#1C1917">QRIS</text>
+
+  <rect x="202" y="18" width="138" height="32" rx="16" fill="#00AED6" stroke="#FFFFFF" stroke-width="2" />
+  <text x="271" y="39" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="13" fill="#FFFFFF">gopay merchant</text>
+
+  <!-- Merchant Identity -->
+  <text x="180" y="94" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="18" fill="#1C1917">PERCHICK - PERFECTLY CHICKEN</text>
+  <text x="180" y="114" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="11.5" fill="#57534E">NMID: ID1026039481203 • PRE-ORDER BATCH 3</text>
+
+  <!-- QR Code Container -->
+  <rect x="48" y="128" width="264" height="248" rx="16" fill="#FFFFFF" stroke="#E7E5E4" stroke-width="2" />
+
+  <!-- QR Matrix (21x21 module scaled at 10px each, centered at x=75, y=147) -->
+  <g transform="translate(75, 147)" fill="#111827">
+    <!-- Top-left finder pattern -->
+    <path d="M0,0 h70 v70 h-70 z M10,10 v50 h50 v-50 z M20,20 h30 v30 h-30 z" fill-rule="evenodd" />
+    <!-- Top-right finder pattern -->
+    <path d="M140,0 h70 v70 h-70 z M150,10 v50 h50 v-50 z M160,20 h30 v30 h-30 z" fill-rule="evenodd" />
+    <!-- Bottom-left finder pattern -->
+    <path d="M0,140 h70 v70 h-70 z M10,150 v50 h50 v-50 z M20,160 h30 v30 h-30 z" fill-rule="evenodd" />
+
+    <!-- Timing & alignment modules -->
+    <rect x="80" y="60" width="10" height="10" />
+    <rect x="100" y="60" width="10" height="10" />
+    <rect x="120" y="60" width="10" height="10" />
+    <rect x="60" y="80" width="10" height="10" />
+    <rect x="60" y="100" width="10" height="10" />
+    <rect x="60" y="120" width="10" height="10" />
+
+    <!-- Data modules -->
+    <rect x="80" y="0" width="20" height="10" />
+    <rect x="110" y="0" width="20" height="10" />
+    <rect x="90" y="10" width="10" height="20" />
+    <rect x="110" y="20" width="20" height="10" />
+    <rect x="80" y="30" width="10" height="20" />
+    <rect x="100" y="40" width="30" height="10" />
+
+    <rect x="0" y="80" width="20" height="10" />
+    <rect x="30" y="80" width="20" height="10" />
+    <rect x="10" y="90" width="20" height="10" />
+    <rect x="40" y="100" width="10" height="20" />
+    <rect x="0" y="110" width="30" height="10" />
+    <rect x="20" y="120" width="20" height="10" />
+
+    <rect x="80" y="80" width="10" height="10" />
+    <rect x="100" y="80" width="20" height="10" />
+    <rect x="130" y="80" width="20" height="10" />
+    <rect x="160" y="80" width="20" height="10" />
+    <rect x="190" y="80" width="20" height="10" />
+
+    <rect x="80" y="100" width="20" height="10" />
+    <rect x="110" y="100" width="10" height="20" />
+    <rect x="140" y="100" width="20" height="10" />
+    <rect x="170" y="100" width="30" height="10" />
+
+    <rect x="80" y="120" width="10" height="20" />
+    <rect x="100" y="130" width="30" height="10" />
+    <rect x="140" y="120" width="20" height="20" />
+    <rect x="170" y="120" width="10" height="10" />
+    <rect x="190" y="120" width="20" height="20" />
+
+    <!-- Alignment box bottom right -->
+    <path d="M140,140 h50 v50 h-50 z M150,150 v30 h30 v-30 z M160,160 h10 v10 h-10 z" fill-rule="evenodd" />
+
+    <rect x="80" y="150" width="20" height="10" />
+    <rect x="110" y="150" width="20" height="10" />
+    <rect x="90" y="160" width="20" height="20" />
+    <rect x="120" y="170" width="10" height="20" />
+    <rect x="80" y="190" width="30" height="20" />
+    <rect x="120" y="200" width="20" height="10" />
+    <rect x="150" y="200" width="30" height="10" />
+    <rect x="190" y="190" width="20" height="20" />
+    <rect x="200" y="150" width="10" height="30" />
+
+    <!-- Center brand badge -->
+    <rect x="88" y="88" width="34" height="34" rx="8" fill="#D91E18" stroke="#FFFFFF" stroke-width="3" />
+    <text x="105" y="110" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="900" font-size="14" fill="#FFC72C">P</text>
+  </g>
+
+  <!-- Footer -->
+  <rect x="20" y="388" width="320" height="34" rx="10" fill="#FFFBEB" stroke="#FDE68A" stroke-width="1.5" />
+  <text x="180" y="409" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="11" fill="#92400E">Scan via GoPay • OVO • DANA • ShopeePay • m-Banking</text>
+</svg>
