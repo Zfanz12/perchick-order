@@ -111,7 +111,7 @@ export interface SubmittedOrder {
   pricing: PriceBreakdown;
   paymentMethod: 'QRIS GoPay Merchant';
   paymentProof: PaymentProof;
-  storageDriver: 'supabase' | 'localStorage';
+  storageDriver: 'google-sheets' | 'supabase' | 'localStorage';
 }
 
 export interface DirectOrderStoreState {

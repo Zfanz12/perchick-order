@@ -255,10 +255,27 @@ export async function submitOrder(
 
   let storageDriver: SubmittedOrder['storageDriver'] = 'localStorage';
 
+  const googleScriptUrl = process.env.NEXT_PUBLIC_GOOGLE_SCRIPT_URL?.trim();
+  if (googleScriptUrl) {
+    try {
+      await fetch(googleScriptUrl, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(baseOrder),
+      });
+      storageDriver = 'google-sheets';
+    } catch {
+      // Fall back to localStorage / Supabase if network fails
+    }
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
-  if (supabaseUrl && supabaseAnonKey) {
+  if (storageDriver === 'localStorage' && supabaseUrl && supabaseAnonKey) {
     const endpoint = `${supabaseUrl.replace(/\/+$/, '')}/rest/v1/perchick_orders`;
     try {
       const response = await fetch(endpoint, {

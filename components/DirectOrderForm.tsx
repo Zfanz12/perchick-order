@@ -6,6 +6,8 @@ import { motion } from 'framer-motion';
 import {
   CalendarClock,
   Check,
+  ChevronLeft,
+  ChevronRight,
   Copy,
   Download,
   Flame,
@@ -162,6 +164,7 @@ export function DirectOrderForm() {
     (state) => state.completeOrderSubmission
   );
 
+  const carouselRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [copiedNominal, setCopiedNominal] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
@@ -352,8 +355,12 @@ export function DirectOrderForm() {
           </h2>
         </div>
 
-        {/* STEP 1: Package Cards (Mobile: swipeable horizontal carousel; Desktop: 3-column grid) */}
-        <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:gap-6">
+        {/* STEP 1: Package Cards (Mobile: swipeable horizontal carousel + stylized arrows; Desktop: 3-column grid) */}
+        <div className="relative">
+          <div
+            ref={carouselRef}
+            className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:gap-6"
+          >
           {MENU_PACKAGES.map((pkg) => {
             const isSelected = draftPackageId === pkg.id;
             const isPopular = Boolean(pkg.isPopular || pkg.id === 'DOUBLE');
@@ -433,6 +440,34 @@ export function DirectOrderForm() {
               </motion.button>
             );
           })}
+          </div>
+
+          {/* Mobile Carousel Navigation Arrows */}
+          <div className="mt-2 flex items-center justify-center gap-3 md:hidden">
+            <button
+              type="button"
+              onClick={() =>
+                carouselRef.current?.scrollBy({ left: -260, behavior: 'smooth' })
+              }
+              aria-label="Geser paket ke kiri"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-[#1C1917] bg-[#FFC72C] text-[#1C1917] shadow-[0_3px_0_#1C1917] transition active:translate-y-0.5"
+            >
+              <ChevronLeft className="h-5 w-5 stroke-[2.75]" />
+            </button>
+            <span className="font-display text-xs font-bold text-[#57534E]">
+              Geser pilih paket
+            </span>
+            <button
+              type="button"
+              onClick={() =>
+                carouselRef.current?.scrollBy({ left: 260, behavior: 'smooth' })
+              }
+              aria-label="Geser paket ke kanan"
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-2 border-[#1C1917] bg-[#FFC72C] text-[#1C1917] shadow-[0_3px_0_#1C1917] transition active:translate-y-0.5"
+            >
+              <ChevronRight className="h-5 w-5 stroke-[2.75]" />
+            </button>
+          </div>
         </div>
 
         {/* Main 2-Column Workspace (Mobile: Customize -> Ringkasan -> Data -> QRIS) */}
@@ -459,16 +494,27 @@ export function DirectOrderForm() {
                           setDraftError(null);
                         }
                       }}
-                      className={`flex min-h-[42px] items-center justify-between gap-2 rounded-xl border-2 px-3 py-2 text-left transition ${active
-                        ? 'border-[#D91E18] bg-[#FFFBEB] ring-2 ring-[#FFC72C]/50'
-                        : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
-                        } ${isTriple ? 'cursor-default' : 'cursor-pointer'}`}
+                      className={`flex min-h-[42px] items-center justify-between gap-2 rounded-xl border-2 px-3 py-2 text-left transition ${
+                        isTriple
+                          ? 'cursor-not-allowed border-stone-300 bg-stone-100 opacity-75'
+                          : active
+                            ? 'cursor-pointer border-[#D91E18] bg-[#FFFBEB] ring-2 ring-[#FFC72C]/50'
+                            : 'cursor-pointer border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
+                      }`}
                     >
-                      <span className="font-display text-sm sm:text-base font-bold text-[#1C1917]">
+                      <span
+                        className={`font-display text-sm sm:text-base font-bold ${
+                          isTriple ? 'text-stone-500' : 'text-[#1C1917]'
+                        }`}
+                      >
                         {side.label}
                       </span>
                       {active && (
-                        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#D91E18] text-white">
+                        <span
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-white ${
+                            isTriple ? 'bg-stone-400' : 'bg-[#D91E18]'
+                          }`}
+                        >
                           <Check className="h-3 w-3 stroke-[3]" />
                         </span>
                       )}
