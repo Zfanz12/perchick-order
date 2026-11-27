@@ -20,10 +20,6 @@ export const metadata: Metadata = {
   title: "PERCHICK – Perfectly Chicken | Pre-Order",
   description:
     "Cravin' something Tasty? Pesan PERCHICK – Paket Single, Double & Triple dengan Macaroni atau Fries, Chicken Crispy, serta saus Cheese, Garlic, atau Mushroom.",
-  icons: {
-    icon: "/images/perchick-logo.png",
-    apple: "/images/perchick-logo.png",
-  },
 };
 
 export default function RootLayout({
