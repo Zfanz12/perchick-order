@@ -1026,17 +1026,6 @@ export function DirectOrderForm() {
                 </div>
               )}
 
-              <div className="space-y-1 rounded-xl bg-[#FFFBEB] px-3 py-2 text-xs text-[#57534E]">
-                <p>
-                  <strong>Jadwal:</strong>{' '}
-                  {selectedSchedule ? selectedSchedule.dayLabel : 'Belum dipilih'}
-                </p>
-                <p>
-                  <strong>Metode:</strong>{' '}
-                  {isDelivery ? 'Delivery' : isPickup ? 'Pickup' : 'Belum dipilih'}
-                </p>
-              </div>
-
               <div className="flex items-center justify-between border-t border-dashed border-[#1C1917]/20 pt-3">
                 <div>
                   <p className="text-xs font-bold uppercase tracking-wider text-[#57534E]">
