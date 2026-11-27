@@ -472,8 +472,15 @@ export function DirectOrderForm() {
 
         {/* Main 2-Column Workspace (Mobile: Customize -> Ringkasan -> Data -> QRIS) */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12 lg:items-start">
-          {/* Customize Package Card (Compact) */}
-          <div className="order-1 space-y-3.5 rounded-3xl border-2 border-[#1C1917] bg-white p-4 shadow-[0_5px_0_#1C1917] sm:p-5 lg:col-span-7 lg:col-start-1">
+          {/* Customize Package Card (Compact, greyed out until a package is selected) */}
+          <div
+            aria-disabled={!draftPackageId}
+            className={`order-1 space-y-3.5 rounded-3xl border-2 border-[#1C1917] bg-white p-4 shadow-[0_5px_0_#1C1917] transition-all sm:p-5 lg:col-span-7 lg:col-start-1 ${
+              !draftPackageId
+                ? 'pointer-events-none select-none opacity-45 grayscale'
+                : ''
+            }`}
+          >
             {/* Karbo: Macaroni / Fries (both selected & static on TRIPLE) */}
             <div className="space-y-2">
               <h3 className="font-display text-base sm:text-lg font-bold text-[#1C1917]">

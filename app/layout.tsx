@@ -17,9 +17,13 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "PERCHICK – Perfectly Chicken | Pre-Order Batch 3",
+  title: "PERCHICK – Perfectly Chicken | Pre-Order",
   description:
-    "Freshly made, crispy, cheesy! Pre-Order Batch 3 PERCHICK – Paket Single, Double & Triple dengan Mac & Cheese, Fries, Chicken Bites, dan saus Cheese, Garlic, atau Mushroom.",
+    "Cravin' something Tasty? Pesan PERCHICK – Paket Single, Double & Triple dengan Macaroni atau Fries, Chicken Crispy, serta saus Cheese, Garlic, atau Mushroom.",
+  icons: {
+    icon: "/images/perchick-logo.png",
+    apple: "/images/perchick-logo.png",
+  },
 };
 
 export default function RootLayout({

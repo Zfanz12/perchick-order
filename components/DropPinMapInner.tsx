@@ -25,9 +25,9 @@ interface DropPinMapInnerProps {
   onChange: (pin: MapPinLocation) => void;
 }
 
-// Default center (Yogyakarta / Indonesia urban center) before user drops/searches/GPS
-const DEFAULT_LAT = -7.771385;
-const DEFAULT_LNG = 110.377499;
+// Default center (Dayeuhkolot / Bandung area) before user drops/searches/GPS
+const DEFAULT_LAT = -6.973007;
+const DEFAULT_LNG = 107.630381;
 const DEFAULT_ZOOM = 14;
 
 function buildGoogleMapsUrl(lat: number, lng: number): string {
