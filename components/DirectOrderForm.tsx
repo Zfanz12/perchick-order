@@ -727,6 +727,10 @@ export function DirectOrderForm() {
                 ✓ {addedFeedback}
               </p>
             )}
+
+            <p className="font-sans text-xs text-[#78716C]">
+              *Sudah termasuk saus sambal dan tomat
+            </p>
           </div>
 
           {/* Customer Info, Schedule, Pickup/Delivery + Notes */}
