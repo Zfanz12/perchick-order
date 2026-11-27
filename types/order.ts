@@ -15,6 +15,7 @@ export interface MenuPackage {
   description: string;
   basePrice: number;
   image: string;
+  images?: string[];
   isPopular?: boolean;
   highlightTag?: string;
   requiresSideChoice: boolean;

@@ -48,6 +48,7 @@ export const MENU_PACKAGES: MenuPackage[] = [
     description: 'Mac / Fries dengan Chicken Slice',
     basePrice: 22000,
     image: '/images/menu-double.jpg',
+    images: ['/images/menu-double.jpg', '/images/menu-double-2.jpg'],
     isPopular: true,
     highlightTag: 'MOST POPULAR',
     requiresSideChoice: true,

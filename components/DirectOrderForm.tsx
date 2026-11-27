@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import {
@@ -173,6 +173,14 @@ export function DirectOrderForm() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [photoTick, setPhotoTick] = useState(0);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setPhotoTick((prev) => prev + 1);
+    }, 4000);
+    return () => window.clearInterval(timer);
+  }, []);
 
   const selectedPackage = draftPackageId ? getPackageById(draftPackageId) : null;
   const isTriple = draftPackageId === 'TRIPLE';
@@ -404,13 +412,32 @@ export function DirectOrderForm() {
                 </div>
 
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FFFBEB]">
-                  <Image
-                    src={pkg.image}
-                    alt={pkg.name}
-                    fill
-                    sizes="(max-width: 768px) 80vw, 33vw"
-                    className="object-cover"
-                  />
+                  {pkg.images && pkg.images.length > 1 ? (
+                    pkg.images.map((src, imgIdx) => {
+                      const isCurrent =
+                        photoTick % pkg.images!.length === imgIdx;
+                      return (
+                        <Image
+                          key={src}
+                          src={src}
+                          alt={`${pkg.name} ${imgIdx + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 80vw, 33vw"
+                          className={`object-cover transition-opacity duration-700 ease-in-out ${
+                            isCurrent ? 'opacity-100' : 'opacity-0'
+                          }`}
+                        />
+                      );
+                    })
+                  ) : (
+                    <Image
+                      src={pkg.image}
+                      alt={pkg.name}
+                      fill
+                      sizes="(max-width: 768px) 80vw, 33vw"
+                      className="object-cover"
+                    />
+                  )}
                 </div>
 
                 <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
