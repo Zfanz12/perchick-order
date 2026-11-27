@@ -178,7 +178,7 @@ export function DirectOrderForm() {
   useEffect(() => {
     const timer = window.setInterval(() => {
       setPhotoTick((prev) => prev + 1);
-    }, 4000);
+    }, 5000);
     return () => window.clearInterval(timer);
   }, []);
 
@@ -414,8 +414,15 @@ export function DirectOrderForm() {
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FFFBEB]">
                   {pkg.images && pkg.images.length > 1 ? (
                     pkg.images.map((src, imgIdx) => {
-                      const isCurrent =
-                        photoTick % pkg.images!.length === imgIdx;
+                      const activeIndex =
+                        pkg.id === 'DOUBLE' &&
+                        draftPackageId === 'DOUBLE' &&
+                        draftSide
+                          ? draftSide === 'MACARONI'
+                            ? 1
+                            : 0
+                          : photoTick % pkg.images!.length;
+                      const isCurrent = activeIndex === imgIdx;
                       return (
                         <Image
                           key={src}
@@ -423,7 +430,7 @@ export function DirectOrderForm() {
                           alt={`${pkg.name} ${imgIdx + 1}`}
                           fill
                           sizes="(max-width: 768px) 80vw, 33vw"
-                          className={`object-cover transition-opacity duration-700 ease-in-out ${
+                          className={`object-cover transition-opacity duration-1000 ease-in-out ${
                             isCurrent ? 'opacity-100' : 'opacity-0'
                           }`}
                         />
