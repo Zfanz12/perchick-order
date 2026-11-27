@@ -352,8 +352,8 @@ export function DirectOrderForm() {
           </h2>
         </div>
 
-        {/* STEP 1: Package Cards (always 3 columns horizontal, including mobile) */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-5 lg:gap-6">
+        {/* STEP 1: Package Cards (Mobile: swipeable horizontal carousel; Desktop: 3-column grid) */}
+        <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:gap-6">
           {MENU_PACKAGES.map((pkg) => {
             const isSelected = draftPackageId === pkg.id;
             const isPopular = Boolean(pkg.isPopular || pkg.id === 'DOUBLE');
@@ -370,14 +370,14 @@ export function DirectOrderForm() {
                     setDraftSide(null);
                   }
                 }}
-                className={`relative flex cursor-pointer flex-col overflow-hidden rounded-3xl bg-white text-left transition-all ${isSelected
-                  ? 'border-[3px] border-[#D91E18] shadow-[0_10px_0_#D91E18] ring-4 ring-[#FFC72C]/70'
+                className={`relative flex w-[78%] shrink-0 snap-center cursor-pointer flex-col overflow-hidden rounded-3xl bg-white text-left transition-all sm:w-[58%] md:w-auto ${isSelected
+                  ? 'border-[3px] border-[#D91E18] shadow-[0_8px_0_#D91E18] ring-4 ring-[#FFC72C]/70'
                   : isPopular
                     ? 'border-2 border-[#1C1917] shadow-[0_6px_0_#1C1917] hover:-translate-y-0.5'
                     : 'border-2 border-[#1C1917]/20 shadow-[0_6px_0_rgba(28,25,23,0.12)] hover:border-[#1C1917]/50'
                   }`}
               >
-                <div className="absolute left-4 right-4 top-3 z-10 flex items-center justify-between gap-2">
+                <div className="absolute left-3.5 right-3.5 top-3 z-10 flex items-center justify-between gap-2">
                   {isPopular ? (
                     <span className="inline-flex items-center gap-1 rounded-full border-2 border-[#1C1917] bg-[#FFC72C] px-3 py-1 font-display text-xs font-bold text-[#1C1917] shadow-[0_2px_0_#1C1917]">
                       <Flame className="h-3.5 w-3.5 fill-[#D91E18] text-[#D91E18]" />
@@ -390,7 +390,7 @@ export function DirectOrderForm() {
                   )}
 
                   {isSelected && (
-                    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#D91E18] text-white shadow">
+                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#D91E18] text-white shadow">
                       <Check className="h-4 w-4 stroke-[3]" />
                     </span>
                   )}
@@ -401,17 +401,17 @@ export function DirectOrderForm() {
                     src={pkg.image}
                     alt={pkg.name}
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes="(max-width: 768px) 80vw, 33vw"
                     className="object-cover"
                   />
                 </div>
 
-                <div className="flex flex-1 flex-col justify-between p-2.5 sm:p-5">
+                <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
                   <div>
-                    <h3 className="font-display text-sm sm:text-2xl font-bold leading-tight text-[#1C1917] text-left">
+                    <h3 className="font-display text-xl sm:text-2xl font-bold leading-tight text-[#1C1917] text-left">
                       {pkg.name}
                     </h3>
-                    <p className="mt-0.5 font-display text-xs sm:text-xl font-bold text-[#D91E18] text-right">
+                    <p className="mt-0.5 font-display text-lg sm:text-xl font-bold text-[#D91E18] text-right">
                       {formatRupiah(pkg.basePrice)}
                     </p>
                     <p className="mt-1 font-sans text-[11px] sm:text-sm text-[#57534E] text-left leading-snug">
