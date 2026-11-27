@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
 import { ArrowDown, MessageCircle } from 'lucide-react';
 import { BRAND_INFO } from '@/constants/menu';
 import { useOrderStore } from '@/store/useOrderStore';
@@ -119,13 +118,6 @@ export default function HomePage() {
               </svg>
               <span>{BRAND_INFO.instagram}</span>
             </a>
-
-            <Link
-              href="/storygram"
-              className="inline-flex items-center gap-2 min-h-[44px] rounded-xl bg-perchick-yellow text-perchick-charcoal px-4 py-2 font-display font-bold text-sm border-2 border-perchick-red-dark shadow-[0_3px_0_#7F1D1D] hover:bg-white transition-colors"
-            >
-              <span>Storygram Frames</span>
-            </Link>
           </div>
         </div>
       </footer>
