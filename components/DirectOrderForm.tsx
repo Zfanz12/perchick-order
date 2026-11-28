@@ -174,13 +174,21 @@ export function DirectOrderForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photoTick, setPhotoTick] = useState(0);
+  const [doubleFadeDuration, setDoubleFadeDuration] = useState<'500' | '1000'>(
+    '1000'
+  );
+
+  const isDoublePhotoLocked =
+    draftPackageId === 'DOUBLE' && draftSide !== null;
 
   useEffect(() => {
+    if (isDoublePhotoLocked) return;
     const timer = window.setInterval(() => {
+      setDoubleFadeDuration('1000');
       setPhotoTick((prev) => prev + 1);
     }, 5000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [isDoublePhotoLocked]);
 
   const selectedPackage = draftPackageId ? getPackageById(draftPackageId) : null;
   const isTriple = draftPackageId === 'TRIPLE';
@@ -207,26 +215,30 @@ export function DirectOrderForm() {
       setDraftError('Pilih karbo Macaroni atau Fries terlebih dahulu.');
       return;
     }
-    if (!draftSauce) {
-      setDraftError('Pilih saus Cheese atau Garlic terlebih dahulu.');
+    if (!draftSauce && !draftMushroom) {
+      setDraftError(
+        'Pilih minimal 1 saus (Cheese, Garlic, Mix, atau Mushroom) terlebih dahulu.'
+      );
       return;
     }
 
     const resolvedSides: SideOptionId[] = isTriple
       ? ['MACARONI', 'FRIES']
       : [draftSide as SideOptionId];
+    const resolvedSauceId: SauceId = draftSauce ?? 'Mushroom';
+    const resolvedAddMushroom = draftSauce ? draftMushroom : false;
 
     addOrderItem(
       draftPackageId,
       resolvedSides,
-      draftSauce,
-      draftMushroom,
+      resolvedSauceId,
+      resolvedAddMushroom,
       draftQty
     );
 
     const sidesText = formatSidesLabel(resolvedSides);
-    const sauceText = getSauceById(draftSauce).name;
-    const mushroomText = draftMushroom ? ' + Mushroom' : '';
+    const sauceText = getSauceById(resolvedSauceId).name;
+    const mushroomText = resolvedAddMushroom ? ' + Mushroom' : '';
     setAddedFeedback(
       `${draftQty}× ${selectedPackage.name} (${sidesText} • ${sauceText}${mushroomText}) ditambahkan`
     );
@@ -237,6 +249,7 @@ export function DirectOrderForm() {
     setDraftSauce(null);
     setDraftMushroom(false);
     setDraftQty(1);
+    setDoubleFadeDuration('1000');
     setSubmitError(null);
     window.setTimeout(() => setAddedFeedback(null), 2400);
   };
@@ -359,7 +372,7 @@ export function DirectOrderForm() {
         {/* Section Heading */}
         <div className="mx-auto max-w-2xl text-center">
           <h2 className="font-display text-3xl font-bold text-[#1C1917] sm:text-4xl">
-            1. Pilih Paketmu
+            Pilih Paketmu
           </h2>
         </div>
 
@@ -369,111 +382,115 @@ export function DirectOrderForm() {
             ref={carouselRef}
             className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-3 md:mx-0 md:grid md:grid-cols-3 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:gap-6"
           >
-          {MENU_PACKAGES.map((pkg) => {
-            const isSelected = draftPackageId === pkg.id;
-            const isPopular = Boolean(pkg.isPopular || pkg.id === 'DOUBLE');
+            {MENU_PACKAGES.map((pkg) => {
+              const isSelected = draftPackageId === pkg.id;
+              const isPopular = Boolean(pkg.isPopular || pkg.id === 'DOUBLE');
 
-            return (
-              <motion.button
-                key={pkg.id}
-                type="button"
-                whileTap={{ scale: 0.985 }}
-                onClick={() => {
-                  setDraftPackageId(pkg.id);
-                  setDraftError(null);
-                  if (pkg.id === 'TRIPLE') {
-                    setDraftSide(null);
-                  }
-                }}
-                className={`relative flex w-[78%] shrink-0 snap-center cursor-pointer flex-col overflow-hidden rounded-3xl bg-white text-left transition-all sm:w-[58%] md:w-auto ${isSelected
-                  ? 'border-[3px] border-[#D91E18] shadow-[0_8px_0_#D91E18] ring-4 ring-[#FFC72C]/70'
-                  : isPopular
-                    ? 'border-2 border-[#1C1917] shadow-[0_6px_0_#1C1917] hover:-translate-y-0.5'
-                    : 'border-2 border-[#1C1917]/20 shadow-[0_6px_0_rgba(28,25,23,0.12)] hover:border-[#1C1917]/50'
-                  }`}
-              >
-                <div className="absolute left-3.5 right-3.5 top-3 z-10 flex items-center justify-between gap-2">
-                  {isPopular ? (
-                    <span className="inline-flex items-center gap-1 rounded-full border-2 border-[#1C1917] bg-[#FFC72C] px-3 py-1 font-display text-xs font-bold text-[#1C1917] shadow-[0_2px_0_#1C1917]">
-                      <Flame className="h-3.5 w-3.5 fill-[#D91E18] text-[#D91E18]" />
-                      MOST POPULAR
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center rounded-full border-2 border-[#1C1917] bg-[#FFFBEB] px-3 py-1 font-display text-xs font-bold text-[#1C1917]">
-                      {pkg.highlightTag}
-                    </span>
-                  )}
+              return (
+                <motion.button
+                  key={pkg.id}
+                  type="button"
+                  whileTap={{ scale: 0.985 }}
+                  onClick={() => {
+                    setDoubleFadeDuration('1000');
+                    setDraftPackageId(pkg.id);
+                    setDraftError(null);
+                    if (pkg.id === 'TRIPLE') {
+                      setDraftSide(null);
+                    }
+                  }}
+                  className={`relative flex w-[78%] shrink-0 snap-center cursor-pointer flex-col overflow-hidden rounded-3xl bg-white text-left transition-all sm:w-[58%] md:w-auto ${isSelected
+                    ? 'border-[3px] border-[#D91E18] shadow-[0_8px_0_#D91E18] ring-4 ring-[#FFC72C]/70'
+                    : isPopular
+                      ? 'border-2 border-[#1C1917] shadow-[0_6px_0_#1C1917] hover:-translate-y-0.5'
+                      : 'border-2 border-[#1C1917]/20 shadow-[0_6px_0_rgba(28,25,23,0.12)] hover:border-[#1C1917]/50'
+                    }`}
+                >
+                  <div className="absolute left-3.5 right-3.5 top-3 z-10 flex items-center justify-between gap-2">
+                    {isPopular ? (
+                      <span className="inline-flex items-center gap-1 rounded-full border-2 border-[#1C1917] bg-[#FFC72C] px-3 py-1 font-display text-xs font-bold text-[#1C1917] shadow-[0_2px_0_#1C1917]">
+                        <Flame className="h-3.5 w-3.5 fill-[#D91E18] text-[#D91E18]" />
+                        MOST POPULAR
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center rounded-full border-2 border-[#1C1917] bg-[#FFFBEB] px-3 py-1 font-display text-xs font-bold text-[#1C1917]">
+                        {pkg.highlightTag}
+                      </span>
+                    )}
 
-                  {isSelected && (
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#D91E18] text-white shadow">
-                      <Check className="h-4 w-4 stroke-[3]" />
-                    </span>
-                  )}
-                </div>
+                    {isSelected && (
+                      <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#D91E18] text-white shadow">
+                        <Check className="h-4 w-4 stroke-[3]" />
+                      </span>
+                    )}
+                  </div>
 
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FFFBEB]">
-                  {pkg.images && pkg.images.length > 1 ? (
-                    pkg.images.map((src, imgIdx) => {
-                      const activeIndex =
-                        pkg.id === 'DOUBLE' &&
-                        draftPackageId === 'DOUBLE' &&
-                        draftSide
-                          ? draftSide === 'MACARONI'
-                            ? 1
-                            : 0
-                          : photoTick % pkg.images!.length;
-                      const isCurrent = activeIndex === imgIdx;
-                      return (
-                        <Image
-                          key={src}
-                          src={src}
-                          alt={`${pkg.name} ${imgIdx + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 80vw, 33vw"
-                          className={`object-cover transition-opacity duration-1000 ease-in-out ${
-                            isCurrent ? 'opacity-100' : 'opacity-0'
+                  <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FFFBEB]">
+                    {pkg.images && pkg.images.length > 1 ? (
+                      pkg.images.map((src, imgIdx) => {
+                        const activeIndex =
+                          pkg.id === 'DOUBLE' &&
+                            draftPackageId === 'DOUBLE' &&
+                            draftSide
+                            ? draftSide === 'MACARONI'
+                              ? 1
+                              : 0
+                            : photoTick % pkg.images!.length;
+                        const isCurrent = activeIndex === imgIdx;
+                        const fadeDurationClass =
+                          doubleFadeDuration === '500'
+                            ? 'duration-500'
+                            : 'duration-1000';
+                        return (
+                          <Image
+                            key={src}
+                            src={src}
+                            alt={`${pkg.name} ${imgIdx + 1}`}
+                            fill
+                            sizes="(max-width: 768px) 80vw, 33vw"
+                            className={`object-cover transition-opacity ease-in-out ${fadeDurationClass} ${isCurrent ? 'opacity-100' : 'opacity-0'
+                              }`}
+                          />
+                        );
+                      })
+                    ) : (
+                      <Image
+                        src={pkg.image}
+                        alt={pkg.name}
+                        fill
+                        sizes="(max-width: 768px) 80vw, 33vw"
+                        className="object-cover"
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
+                    <div>
+                      <h3 className="font-display text-xl sm:text-2xl font-bold leading-tight text-[#1C1917] text-left">
+                        {pkg.name}
+                      </h3>
+                      <p className="mt-0.5 font-display text-lg sm:text-xl font-bold text-[#D91E18] text-right">
+                        {formatRupiah(pkg.basePrice)}
+                      </p>
+                      <p className="mt-1 font-sans text-[11px] sm:text-sm text-[#57534E] text-left leading-snug">
+                        {pkg.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-2 sm:mt-4 flex items-center justify-end border-t border-[#1C1917]/10 pt-2 sm:pt-3">
+                      <span
+                        className={`rounded-xl px-3 py-1 font-display text-xs font-bold ${isSelected
+                          ? 'bg-[#D91E18] text-white'
+                          : 'border border-[#1C1917]/15 bg-[#FFFBEB] text-[#1C1917]'
                           }`}
-                        />
-                      );
-                    })
-                  ) : (
-                    <Image
-                      src={pkg.image}
-                      alt={pkg.name}
-                      fill
-                      sizes="(max-width: 768px) 80vw, 33vw"
-                      className="object-cover"
-                    />
-                  )}
-                </div>
-
-                <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
-                  <div>
-                    <h3 className="font-display text-xl sm:text-2xl font-bold leading-tight text-[#1C1917] text-left">
-                      {pkg.name}
-                    </h3>
-                    <p className="mt-0.5 font-display text-lg sm:text-xl font-bold text-[#D91E18] text-right">
-                      {formatRupiah(pkg.basePrice)}
-                    </p>
-                    <p className="mt-1 font-sans text-[11px] sm:text-sm text-[#57534E] text-left leading-snug">
-                      {pkg.description}
-                    </p>
+                      >
+                        {isSelected ? 'Dipilih' : 'Pilih'}
+                      </span>
+                    </div>
                   </div>
-
-                  <div className="mt-2 sm:mt-4 flex items-center justify-end border-t border-[#1C1917]/10 pt-2 sm:pt-3">
-                    <span
-                      className={`rounded-xl px-3 py-1 font-display text-xs font-bold ${isSelected
-                        ? 'bg-[#D91E18] text-white'
-                        : 'border border-[#1C1917]/15 bg-[#FFFBEB] text-[#1C1917]'
-                        }`}
-                    >
-                      {isSelected ? 'Dipilih' : 'Pilih'}
-                    </span>
-                  </div>
-                </div>
-              </motion.button>
-            );
-          })}
+                </motion.button>
+              );
+            })}
           </div>
 
           {/* Mobile Carousel Navigation Arrows */}
@@ -509,11 +526,10 @@ export function DirectOrderForm() {
           {/* Customize Package Card (Compact, greyed out until a package is selected) */}
           <div
             aria-disabled={!draftPackageId}
-            className={`order-1 space-y-3.5 rounded-3xl border-2 border-[#1C1917] bg-white p-4 shadow-[0_5px_0_#1C1917] transition-all sm:p-5 lg:col-span-7 lg:col-start-1 ${
-              !draftPackageId
+            className={`order-1 space-y-3.5 rounded-3xl border-2 border-[#1C1917] bg-white p-4 shadow-[0_5px_0_#1C1917] transition-all sm:p-5 lg:col-span-7 lg:col-start-1 ${!draftPackageId
                 ? 'pointer-events-none select-none opacity-45 grayscale'
                 : ''
-            }`}
+              }`}
           >
             {/* Karbo: Macaroni / Fries (both selected & static on TRIPLE) */}
             <div className="space-y-2">
@@ -531,30 +547,28 @@ export function DirectOrderForm() {
                       disabled={isTriple}
                       onClick={() => {
                         if (!isTriple) {
+                          setDoubleFadeDuration('500');
                           setDraftSide(side.id);
                           setDraftError(null);
                         }
                       }}
-                      className={`flex min-h-[42px] items-center justify-between gap-2 rounded-xl border-2 px-3 py-2 text-left transition ${
-                        isTriple
+                      className={`flex min-h-[42px] items-center justify-between gap-2 rounded-xl border-2 px-3 py-2 text-left transition ${isTriple
                           ? 'cursor-not-allowed border-stone-300 bg-stone-100 opacity-75'
                           : active
                             ? 'cursor-pointer border-[#D91E18] bg-[#FFFBEB] ring-2 ring-[#FFC72C]/50'
                             : 'cursor-pointer border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
-                      }`}
+                        }`}
                     >
                       <span
-                        className={`font-display text-sm sm:text-base font-bold ${
-                          isTriple ? 'text-stone-500' : 'text-[#1C1917]'
-                        }`}
+                        className={`font-display text-sm sm:text-base font-bold ${isTriple ? 'text-stone-500' : 'text-[#1C1917]'
+                          }`}
                       >
                         {side.label}
                       </span>
                       {active && (
                         <span
-                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-white ${
-                            isTriple ? 'bg-stone-400' : 'bg-[#D91E18]'
-                          }`}
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full text-white ${isTriple ? 'bg-stone-400' : 'bg-[#D91E18]'
+                            }`}
                         >
                           <Check className="h-3 w-3 stroke-[3]" />
                         </span>
@@ -570,7 +584,7 @@ export function DirectOrderForm() {
               )}
             </div>
 
-            {/* Saus: Cheese / Garlic only (no price text, no description) */}
+            {/* Saus: Cheese / Garlic (checkboxes), Mix Saus, and Mushroom Sauce */}
             <div className="space-y-2 border-t border-[#1C1917]/10 pt-3.5">
               <h3 className="font-display text-base sm:text-lg font-bold text-[#1C1917]">
                 2. Pilih Saus
@@ -585,7 +599,21 @@ export function DirectOrderForm() {
                       key={sauce.id}
                       type="button"
                       onClick={() => {
-                        setDraftSauce(sauce.id);
+                        setDraftSauce((prev) => {
+                          if (sauce.id === 'Cheese') {
+                            if (prev === 'Cheese') return null;
+                            if (prev === 'Garlic') return 'Mix';
+                            if (prev === 'Mix') return 'Garlic';
+                            return 'Cheese';
+                          }
+                          if (sauce.id === 'Garlic') {
+                            if (prev === 'Garlic') return null;
+                            if (prev === 'Cheese') return 'Mix';
+                            if (prev === 'Mix') return 'Cheese';
+                            return 'Garlic';
+                          }
+                          return prev === sauce.id ? null : sauce.id;
+                        });
                         setDraftError(null);
                       }}
                       className={`flex min-h-[42px] cursor-pointer items-center justify-between gap-2 rounded-xl border-2 px-3 py-2 text-left transition ${active
@@ -593,14 +621,19 @@ export function DirectOrderForm() {
                         : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
                         }`}
                     >
-                      <span className="font-display text-sm sm:text-base font-bold text-[#1C1917]">
-                        {sauce.name}
-                      </span>
-                      {active && (
-                        <span className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#D91E18] text-white">
-                          <Check className="h-3 w-3 stroke-[3]" />
+                      <span className="flex items-center gap-2.5">
+                        <span
+                          className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 ${active
+                            ? 'border-[#D91E18] bg-[#D91E18] text-white'
+                            : 'border-[#1C1917]/35 bg-white'
+                            }`}
+                        >
+                          {active && <Check className="h-3 w-3 stroke-[3]" />}
                         </span>
-                      )}
+                        <span className="font-display text-sm sm:text-base font-bold text-[#1C1917]">
+                          {sauce.name}
+                        </span>
+                      </span>
                     </button>
                   );
                 })}
@@ -638,17 +671,14 @@ export function DirectOrderForm() {
                   +{formatRupiah(MIX_SAUCE_ADDON_PRICE)}
                 </span>
               </button>
-            </div>
 
-            {/* Add-on: + Mushroom with plain black price text (no pill, no description) */}
-            <div className="space-y-2 border-t border-[#1C1917]/10 pt-3.5">
-              <h3 className="font-display text-base sm:text-lg font-bold text-[#1C1917]">
-                Add-on
-              </h3>
-
+              {/* Mushroom Sauce Checkbox (+Rp5.000, can be selected on its own or combined) */}
               <button
                 type="button"
-                onClick={() => setDraftMushroom((prev) => !prev)}
+                onClick={() => {
+                  setDraftMushroom((prev) => !prev);
+                  setDraftError(null);
+                }}
                 className={`flex min-h-[42px] w-full cursor-pointer items-center justify-between gap-3 rounded-xl border-2 px-3 py-2 text-left transition ${draftMushroom
                   ? 'border-[#D91E18] bg-[#FFFBEB] ring-2 ring-[#FFC72C]/50'
                   : 'border-[#1C1917]/15 bg-white hover:border-[#1C1917]/40'
@@ -656,7 +686,7 @@ export function DirectOrderForm() {
               >
                 <span className="flex items-center gap-2.5">
                   <span
-                    className={`flex h-4 w-4 items-center justify-center rounded border-2 ${draftMushroom
+                    className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border-2 ${draftMushroom
                       ? 'border-[#D91E18] bg-[#D91E18] text-white'
                       : 'border-[#1C1917]/35 bg-white'
                       }`}
@@ -664,11 +694,11 @@ export function DirectOrderForm() {
                     {draftMushroom && <Check className="h-3 w-3 stroke-[3]" />}
                   </span>
                   <span className="font-display text-sm sm:text-base font-bold text-[#1C1917]">
-                    + Mushroom Sauce
+                    Mushroom Sauce
                   </span>
                 </span>
 
-                <span className="font-sans text-xs sm:text-sm font-bold text-[#1C1917]">
+                <span className="font-sans text-xs sm:text-sm font-bold text-[#1C1917] shrink-0">
                   +{formatRupiah(MUSHROOM_ADDON_PRICE)}
                 </span>
               </button>
@@ -1112,7 +1142,7 @@ export function DirectOrderForm() {
 
               {pricing.totalMushroom > 0 && (
                 <div className="flex items-center justify-between text-xs font-semibold text-[#1C1917]">
-                  <span>Add-on Mushroom</span>
+                  <span>Saus Mushroom</span>
                   <span>+{formatRupiah(pricing.totalMushroom)}</span>
                 </div>
               )}

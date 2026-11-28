@@ -385,7 +385,7 @@ export function buildWhatsAppOrderUrl(order: SubmittedOrder): string {
   }
 
   if (order.pricing.totalMushroom > 0) {
-    lines.push(`• Add-on Mushroom: ${formatRupiah(order.pricing.totalMushroom)}`);
+    lines.push(`• Saus Mushroom: ${formatRupiah(order.pricing.totalMushroom)}`);
   }
 
   lines.push(

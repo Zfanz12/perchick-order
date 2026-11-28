@@ -2,7 +2,7 @@ export type PackageId = 'SINGLE' | 'DOUBLE' | 'TRIPLE';
 
 export type SideOptionId = 'MACARONI' | 'FRIES';
 
-export type SauceId = 'Cheese' | 'Garlic' | 'Mix';
+export type SauceId = 'Cheese' | 'Garlic' | 'Mix' | 'Mushroom';
 
 export type DeliveryScheduleId = 'MINGGU_29_NOV' | 'SENIN_30_NOV';
 
