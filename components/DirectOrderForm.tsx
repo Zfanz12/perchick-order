@@ -761,9 +761,14 @@ export function DirectOrderForm() {
               </p>
             )}
 
-            <p className="font-sans text-xs text-[#78716C]">
-              *Sudah termasuk saus sambal dan tomat
-            </p>
+            <div className="space-y-1 font-sans text-xs leading-relaxed text-[#78716C]">
+              <p>
+                *1 saus standar (Cheese/Garlic) gratis; Mix Cheese + Garlic (+Rp3.000); Mushroom saja (+Rp5.000); Mushroom + Cheese/Garlic (+Rp8.000); 3 saus sekaligus (+Rp11.000).
+              </p>
+              <p>
+                *Sudah termasuk saus sambal dan tomat terpisah (bisa request di catatan jika ingin digabung).
+              </p>
+            </div>
           </div>
 
           {/* Customer Info, Schedule, Pickup/Delivery + Notes */}
