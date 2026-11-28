@@ -37,6 +37,7 @@ export const MENU_PACKAGES: MenuPackage[] = [
     description: 'Mac / Fries dengan Chicken Bites',
     basePrice: 15000,
     image: '/images/menu-single.jpg',
+    images: ['/images/menu-single.jpg', '/images/menu-single-mac.jpg'],
     isPopular: false,
     highlightTag: 'HEMAT 15K',
     requiresSideChoice: true,
@@ -118,10 +119,37 @@ export function getSauceById(id: SauceId): SauceOption {
   return found;
 }
 
+export function calculateSaucePricing(
+  sauceId: SauceId | null,
+  addMushroom: boolean
+): {
+  extraStandardSauceCost: number;
+  mushroomCost: number;
+  totalSauceExtra: number;
+} {
+  const hasMushroom = sauceId === 'Mushroom' || addMushroom;
+  const mushroomCost = hasMushroom ? MUSHROOM_ADDON_PRICE : 0;
+
+  let extraStandardSauceCost = 0;
+  if (hasMushroom) {
+    if (sauceId === 'Cheese' || sauceId === 'Garlic') {
+      extraStandardSauceCost = MIX_SAUCE_ADDON_PRICE;
+    } else if (sauceId === 'Mix') {
+      extraStandardSauceCost = MIX_SAUCE_ADDON_PRICE * 2;
+    }
+  } else if (sauceId === 'Mix') {
+    extraStandardSauceCost = MIX_SAUCE_ADDON_PRICE;
+  }
+
+  return {
+    extraStandardSauceCost,
+    mushroomCost,
+    totalSauceExtra: extraStandardSauceCost + mushroomCost,
+  };
+}
+
 export function getSauceExtraPrice(id: SauceId): number {
-  if (id === 'Mix') return MIX_SAUCE_ADDON_PRICE;
-  if (id === 'Mushroom') return MUSHROOM_ADDON_PRICE;
-  return 0;
+  return calculateSaucePricing(id, false).totalSauceExtra;
 }
 
 export function getScheduleById(id: DeliveryScheduleId): DeliveryScheduleOption {
@@ -155,15 +183,14 @@ export function calculateItemsPricing(items: OrderItem[]): PriceBreakdown {
     (acc, item) => {
       const pkg = getPackageById(item.packageId);
       const qty = Math.max(1, Math.floor(item.quantity));
-      const mixSauceCost = item.sauceId === 'Mix' ? MIX_SAUCE_ADDON_PRICE : 0;
-      const mushroomCost =
-        item.sauceId === 'Mushroom' || item.addMushroom
-          ? MUSHROOM_ADDON_PRICE
-          : 0;
+      const { extraStandardSauceCost, mushroomCost } = calculateSaucePricing(
+        item.sauceId,
+        item.addMushroom
+      );
 
       acc.totalItems += qty;
       acc.subtotalPackages += pkg.basePrice * qty;
-      acc.totalMixSauce += mixSauceCost * qty;
+      acc.totalMixSauce += extraStandardSauceCost * qty;
       acc.totalMushroom += mushroomCost * qty;
       acc.grandTotal =
         acc.subtotalPackages + acc.totalMixSauce + acc.totalMushroom;

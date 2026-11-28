@@ -33,11 +33,11 @@ import {
   SAUCE_OPTIONS,
   SIDE_OPTIONS,
   calculateItemsPricing,
+  calculateSaucePricing,
   formatRupiah,
   formatSidesLabel,
   getPackageById,
   getSauceById,
-  getSauceExtraPrice,
   getScheduleById,
 } from '@/constants/menu';
 import { DeliveryMapPicker } from '@/components/DeliveryMapPicker';
@@ -174,28 +174,20 @@ export function DirectOrderForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [photoTick, setPhotoTick] = useState(0);
-  const [doubleFadeDuration, setDoubleFadeDuration] = useState<'500' | '1000'>(
-    '1000'
-  );
-
-  const isDoublePhotoLocked =
-    draftPackageId === 'DOUBLE' && draftSide !== null;
+  const [karboClickFade, setKarboClickFade] = useState(false);
 
   useEffect(() => {
-    if (isDoublePhotoLocked) return;
     const timer = window.setInterval(() => {
-      setDoubleFadeDuration('1000');
       setPhotoTick((prev) => prev + 1);
     }, 5000);
     return () => window.clearInterval(timer);
-  }, [isDoublePhotoLocked]);
+  }, []);
 
   const selectedPackage = draftPackageId ? getPackageById(draftPackageId) : null;
   const isTriple = draftPackageId === 'TRIPLE';
   const draftUnitPrice = selectedPackage
     ? selectedPackage.basePrice +
-    (draftSauce ? getSauceExtraPrice(draftSauce) : 0) +
-    (draftMushroom ? MUSHROOM_ADDON_PRICE : 0)
+      calculateSaucePricing(draftSauce, draftMushroom).totalSauceExtra
     : 0;
 
   const pricing = calculateItemsPricing(orderItems);
@@ -249,7 +241,7 @@ export function DirectOrderForm() {
     setDraftSauce(null);
     setDraftMushroom(false);
     setDraftQty(1);
-    setDoubleFadeDuration('1000');
+    setKarboClickFade(false);
     setSubmitError(null);
     window.setTimeout(() => setAddedFeedback(null), 2400);
   };
@@ -392,7 +384,7 @@ export function DirectOrderForm() {
                   type="button"
                   whileTap={{ scale: 0.985 }}
                   onClick={() => {
-                    setDoubleFadeDuration('1000');
+                    setKarboClickFade(false);
                     setDraftPackageId(pkg.id);
                     setDraftError(null);
                     if (pkg.id === 'TRIPLE') {
@@ -428,17 +420,18 @@ export function DirectOrderForm() {
                   <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FFFBEB]">
                     {pkg.images && pkg.images.length > 1 ? (
                       pkg.images.map((src, imgIdx) => {
-                        const activeIndex =
-                          pkg.id === 'DOUBLE' &&
-                            draftPackageId === 'DOUBLE' &&
-                            draftSide
-                            ? draftSide === 'MACARONI'
-                              ? 1
-                              : 0
-                            : photoTick % pkg.images!.length;
+                        const isCardLocked =
+                          (pkg.id === 'SINGLE' || pkg.id === 'DOUBLE') &&
+                          draftPackageId === pkg.id &&
+                          draftSide !== null;
+                        const activeIndex = isCardLocked
+                          ? draftSide === 'MACARONI'
+                            ? 1
+                            : 0
+                          : photoTick % pkg.images!.length;
                         const isCurrent = activeIndex === imgIdx;
                         const fadeDurationClass =
-                          doubleFadeDuration === '500'
+                          isCardLocked && karboClickFade
                             ? 'duration-500'
                             : 'duration-1000';
                         return (
@@ -547,7 +540,7 @@ export function DirectOrderForm() {
                       disabled={isTriple}
                       onClick={() => {
                         if (!isTriple) {
-                          setDoubleFadeDuration('500');
+                          setKarboClickFade(true);
                           setDraftSide(side.id);
                           setDraftError(null);
                         }
@@ -634,12 +627,17 @@ export function DirectOrderForm() {
                           {sauce.name}
                         </span>
                       </span>
+                      {draftMushroom && (
+                        <span className="font-sans text-xs font-bold text-[#1C1917] shrink-0">
+                          +{formatRupiah(MIX_SAUCE_ADDON_PRICE)}
+                        </span>
+                      )}
                     </button>
                   );
                 })}
               </div>
 
-              {/* Mix Sauce Checkbox (+Rp3.000) */}
+              {/* Mix Sauce Checkbox (+Rp3.000, or +Rp6.000 when combined with Mushroom) */}
               <button
                 type="button"
                 onClick={() => {
@@ -668,7 +666,12 @@ export function DirectOrderForm() {
                 </span>
 
                 <span className="font-sans text-xs sm:text-sm font-bold text-[#1C1917] shrink-0">
-                  +{formatRupiah(MIX_SAUCE_ADDON_PRICE)}
+                  +
+                  {formatRupiah(
+                    draftMushroom
+                      ? MIX_SAUCE_ADDON_PRICE * 2
+                      : MIX_SAUCE_ADDON_PRICE
+                  )}
                 </span>
               </button>
 
@@ -1064,8 +1067,8 @@ export function DirectOrderForm() {
                     const sauceLabel = getSauceById(item.sauceId).name;
                     const lineTotal =
                       (pkg.basePrice +
-                        getSauceExtraPrice(item.sauceId) +
-                        (item.addMushroom ? MUSHROOM_ADDON_PRICE : 0)) *
+                        calculateSaucePricing(item.sauceId, item.addMushroom)
+                          .totalSauceExtra) *
                       item.quantity;
 
                     return (
@@ -1135,7 +1138,7 @@ export function DirectOrderForm() {
 
               {pricing.totalMixSauce > 0 && (
                 <div className="flex items-center justify-between text-xs font-semibold text-[#1C1917]">
-                  <span>Mix Saus (Cheese + Garlic)</span>
+                  <span>Tambahan Saus (Mix)</span>
                   <span>+{formatRupiah(pricing.totalMixSauce)}</span>
                 </div>
               )}

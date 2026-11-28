@@ -28,13 +28,12 @@
 
 import {
   BRAND_INFO,
-  MUSHROOM_ADDON_PRICE,
   calculateItemsPricing,
+  calculateSaucePricing,
   formatRupiah,
   formatSidesLabel,
   getPackageById,
   getSauceById,
-  getSauceExtraPrice,
   getScheduleById,
 } from '@/constants/menu';
 import type {
@@ -204,9 +203,10 @@ export async function submitOrder(
     const sauce = getSauceById(item.sauceId);
     const qty = Math.max(1, Math.floor(item.quantity));
     const unitBasePrice = pkg.basePrice;
-    const unitAddonPrice =
-      getSauceExtraPrice(sauce.id) +
-      (item.addMushroom ? MUSHROOM_ADDON_PRICE : 0);
+    const unitAddonPrice = calculateSaucePricing(
+      sauce.id,
+      item.addMushroom
+    ).totalSauceExtra;
     const sidesLabel =
       item.packageId === 'TRIPLE'
         ? 'Macaroni + Fries'
@@ -381,7 +381,7 @@ export function buildWhatsAppOrderUrl(order: SubmittedOrder): string {
   );
 
   if (order.pricing.totalMixSauce > 0) {
-    lines.push(`• Mix Saus (Cheese + Garlic): ${formatRupiah(order.pricing.totalMixSauce)}`);
+    lines.push(`• Tambahan Saus (Mix): ${formatRupiah(order.pricing.totalMixSauce)}`);
   }
 
   if (order.pricing.totalMushroom > 0) {
