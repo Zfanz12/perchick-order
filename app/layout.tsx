@@ -16,10 +16,38 @@ const plusJakartaSans = Plus_Jakarta_Sans({
   display: "swap",
 });
 
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() || "https://perchickin.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "PERCHICK – Perfectly Chicken | Pre-Order",
   description:
     "Cravin' something Tasty? Pesan PERCHICK – Paket Single, Double & Triple dengan Macaroni atau Fries, Chicken Crispy, serta saus Cheese, Garlic, atau Mushroom.",
+  openGraph: {
+    title: "PERCHICK – Perfectly Chicken | Pre-Order",
+    description:
+      "Rasakan PERCHICKan Nikmatnya! Pesan Paket Single, Double & Triple dengan Macaroni atau Fries, Chicken Crispy, serta saus Cheese, Garlic, atau Mushroom.",
+    url: SITE_URL,
+    siteName: "PERCHICK",
+    locale: "id_ID",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PERCHICK – Perfectly Chicken | Rasakan PERCHICKan Nikmatnya",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PERCHICK – Perfectly Chicken | Pre-Order",
+    description:
+      "Rasakan PERCHICKan Nikmatnya! Pre-Order Paket Single, Double & Triple.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
