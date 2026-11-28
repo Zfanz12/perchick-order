@@ -763,7 +763,7 @@ export function DirectOrderForm() {
 
             <div className="space-y-1 font-sans text-xs leading-relaxed text-[#78716C]">
               <p>
-                *1 saus standar (Cheese/Garlic) gratis; Mix Cheese + Garlic (+Rp3.000); Mushroom saja (+Rp5.000); Mushroom + Cheese/Garlic (+Rp8.000); 3 saus sekaligus (+Rp11.000).
+                *Jika dikombinasikan dengan Mushroom Sauce (+Rp5.000), tambahan Cheese/Garlic dikenakan +Rp3.000 per saus (total +Rp8.000 untuk 2 saus, atau +Rp11.000 untuk 3 saus).
               </p>
               <p>
                 *Sudah termasuk saus sambal dan tomat terpisah (bisa request di catatan jika ingin digabung).
