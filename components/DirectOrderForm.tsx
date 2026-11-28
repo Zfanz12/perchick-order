@@ -763,7 +763,7 @@ export function DirectOrderForm() {
 
             <div className="space-y-1 font-sans text-xs leading-relaxed text-[#78716C]">
               <p>
-                *Jika dikombinasikan dengan Mushroom Sauce (+Rp5.000), tambahan Cheese/Garlic dikenakan +Rp3.000 per saus (total +Rp8.000 untuk 2 saus, atau +Rp11.000 untuk 3 saus).
+                *Jika saus Cheese atau Garlic dikombinasikan dengan Mushroom Sauce (+5k), saus Cheese/Garlic dikenakan (+3k) per saus, sehingga total menjadi +8k (atau +11k jika 3 saus).
               </p>
               <p>
                 *Sudah termasuk saus sambal dan tomat terpisah (bisa request di catatan jika ingin digabung).
